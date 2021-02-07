@@ -26,12 +26,25 @@ export function stringifyQueryParams(query: Record<string, unknown>): string {
   return qsStringify(query);
 }
 
+/**
+ * Todo Deprecated
+ */
 export function getControllerMethodRoute(
   controller: Controller,
   controllerMethod: ControllerMethod,
 ): string {
   const controllerRoute = Reflect.getMetadata(PATH_METADATA, controller);
   const methodRoute = Reflect.getMetadata(PATH_METADATA, controllerMethod);
+  return joinRoutes(controllerRoute, methodRoute);
+}
+
+export function getPath<
+  T extends { prototype: any },
+  K extends keyof T['prototype']
+>(controller: T, methodName: K): string {
+  const method = controller.prototype[methodName];
+  const methodRoute = Reflect.getMetadata(PATH_METADATA, method);
+  const controllerRoute = Reflect.getMetadata(PATH_METADATA, controller);
   return joinRoutes(controllerRoute, methodRoute);
 }
 

@@ -1,10 +1,14 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 
-import { SignedUrlGuard, UrlGeneratorService } from 'nestjs-url-generator';
+import {
+  getPath,
+  SignedUrlGuard,
+  UrlGeneratorService,
+} from 'nestjs-url-generator';
 import { EmailParams } from './params/email.params';
 import { EmailQuery } from './query/email.query';
 
-@Controller()
+@Controller('email')
 export class EmailController {
   constructor(private readonly urlGeneratorService: UrlGeneratorService) {}
 
@@ -35,16 +39,15 @@ export class EmailController {
       },
     };
 
-    const urlGenerator = this.urlGeneratorService.generateUrlFromController({
-      controller: EmailController,
-      controllerMethod: EmailController.prototype.target,
+    const urlGenerator = this.urlGeneratorService.generateUrlFromPath({
+      relativePath: getPath(EmailController, 'target'),
       query: query,
       params: emailParams,
     });
     return urlGenerator;
   }
 
-  @Get('emailVerification/version/:version/user/:userId')
+  @Get('verification/version/:version/user/:userId')
   @UseGuards(SignedUrlGuard)
   async emailVerification(
     @Param() emailParams: EmailParams,
@@ -72,9 +75,8 @@ export class EmailController {
       },
     };
 
-    const urlGenerator = this.urlGeneratorService.signedControllerUrl({
-      controller: EmailController,
-      controllerMethod: EmailController.prototype.emailVerification,
+    const urlGenerator = this.urlGeneratorService.signedUrl({
+      relativePath: getPath(EmailController, 'emailVerification'),
       expirationDate: new Date('2021-12-12'),
       query: query,
       params: emailParams,

@@ -104,16 +104,8 @@ export class ApplicationModule {}
 ## Using Service
 
 Now you need to register the service, by injecting it to the constructor.
-There are two methods for generating url:
 
 ```typescript
-generateUrlFromController({
-  controller,
-  controllerMethod,
-  /*?*/ query,
-  /*?*/ params,
-});
-
 generateUrlFromPath({
   relativePath,
   /*?*/ query,
@@ -143,9 +135,9 @@ export class AppController {
 
     // This will generate:
     // localhost:3000/emailVerification/1.0/12?email=email%40email
-    return this.urlGeneratorService.generateUrlFromController({
-      controller: AppController,
-      controllerMethod: AppController.prototype.emailVerification,
+    return this.urlGeneratorService.generateUrlFromPath({
+      // getPath is type safe with the second parameter is controller method
+      relativePath: getPath(EmailController, 'emailVerification'),
       query: query,
       params: params,
     });
@@ -155,17 +147,7 @@ export class AppController {
 
 ### Generate Signed URL
 
-There are two methods for generating url:
-
 ```typescript
-signedControllerUrl({
-  controller,
-  controllerMethod,
-  /*?*/ expirationDate,
-  /*?*/ query,
-  /*?*/ params,
-});
-
 signedUrl({
   relativePath,
   /*?*/ expirationDate,
@@ -189,9 +171,8 @@ export class AppController {
     // localhost:3000/emailVerification?
     // expirationDate=2021-12-12T00%3A00%3A00.000Z&
     // signed=84b5a021c433d0ee961932ac0ec04d5dd5ffd6f7fdb60b46083cfe474dfae3c0
-    return this.urlGeneratorService.signedControllerUrl({
-      controller: AppController,
-      controllerMethod: AppController.prototype.emailVerification,
+    return this.urlGeneratorService.signedUrl({
+      relativePath: getPath(EmailController, 'emailVerification'),
       expirationDate: new Date('2021-12-12'),
       // or using DateTime library of your choice
       // will be expired 30 minutes after it was created
@@ -256,3 +237,4 @@ require('crypto').randomBytes(64, (err, buf) => {
 - [ ] Create test (expiration, query clash, tampered, with or without globalPrefix, request with query & param)
 - [ ] Automate CI, npm run build, push, npm publish
 - [ ] Add warning if target for signerUrl doesn't have guard
+- [ ] remove getControllerMethodRoute
